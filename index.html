@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#120610">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <title>Velvet & Vow | Couples Intimacy & Romance Suite</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<body>
+  <!-- Private Passcode Security Gate (Protects your app anywhere on the internet) -->
+  <div id="passcode-gate" class="gate-overlay">
+    <div class="gate-card">
+      <div class="gate-brand">
+        <span class="gate-gem">✦</span>
+        <h2>Velvet & Vow</h2>
+        <p class="gate-sub">Enter Couple PIN to Unlock</p>
+      </div>
+
+      <div class="pin-dots-row">
+        <span class="pin-dot" id="p-dot-0"></span>
+        <span class="pin-dot" id="p-dot-1"></span>
+        <span class="pin-dot" id="p-dot-2"></span>
+        <span class="pin-dot" id="p-dot-3"></span>
+      </div>
+
+      <div id="pin-error-msg" class="pin-error hidden">Incorrect PIN. Try again.</div>
+
+      <div class="numpad-grid">
+        <button class="num-key" data-val="1">1</button>
+        <button class="num-key" data-val="2">2</button>
+        <button class="num-key" data-val="3">3</button>
+        <button class="num-key" data-val="4">4</button>
+        <button class="num-key" data-val="5">5</button>
+        <button class="num-key" data-val="6">6</button>
+        <button class="num-key" data-val="7">7</button>
+        <button class="num-key" data-val="8">8</button>
+        <button class="num-key" data-val="9">9</button>
+        <button class="num-key ghost-key" id="num-disguise-btn" title="Disguise Mode">🛡️</button>
+        <button class="num-key" data-val="0">0</button>
+        <button class="num-key ghost-key" id="num-delete-btn">⌫</button>
+      </div>
+
+      <p class="gate-hint">Default PIN: <b>1234</b> (Change anytime in settings)</p>
+    </div>
+  </div>
+
+  <!-- Discreet / Panic Screen (Switches in 1 tap if someone walks in) -->
+  <div id="discreet-overlay" class="discreet-view hidden">
+    <div class="discreet-header">
+      <div class="discreet-logo">📝 Daily Notes & Recipe Ideas</div>
+      <button id="exit-discreet-btn" class="ghost-btn">Unlock</button>
+    </div>
+    <div class="discreet-content">
+      <div class="recipe-card">
+        <h3>🥗 Mediterranean Roasted Veggie Bowl</h3>
+        <p>• Bell peppers, zucchini, olive oil, dried oregano</p>
+        <p>• Roast at 200°C for 25 minutes until golden brown</p>
+      </div>
+      <div class="recipe-card">
+        <h3>🛒 Weekly Shopping List</h3>
+        <p>☑ Almond milk & oats</p>
+        <p>☑ Fresh mint & lemons</p>
+        <p>☑ Olive oil & Himalayan salt</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Two-Phone Pairing Modal -->
+  <div id="pairing-modal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>📲 Connect Two Phones</h3>
+        <button id="close-pairing-modal-btn" class="ghost-btn">✕</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-sub">Use the app together on one screen, or sync both of your phones in real-time!</p>
+        
+        <div class="mode-selector-tabs mt-3">
+          <button id="mode-shared-btn" class="mode-tab-btn active">📱 Together on 1 Phone</button>
+          <button id="mode-paired-btn" class="mode-tab-btn">📲 2 Phones Synced</button>
+        </div>
+
+        <div id="paired-settings-panel" class="paired-panel hidden mt-3">
+          <div class="form-group mb-3">
+            <label class="form-label">This device belongs to:</label>
+            <div class="role-selector-btns">
+              <button id="role-husband-btn" class="role-choice-btn active" data-role="husband">🧔 Husband</button>
+              <button id="role-wife-btn" class="role-choice-btn" data-role="wife">👑 Wife</button>
+            </div>
+          </div>
+
+          <div class="form-group mb-3">
+            <label class="form-label">Our Secret Couple Code:</label>
+            <div class="code-input-row">
+              <input type="text" id="couple-room-code-input" class="custom-input" value="LOVE24" maxlength="12">
+              <button id="save-room-code-btn" class="secondary-btn">Connect</button>
+            </div>
+          </div>
+
+          <div class="connection-status-bar">
+            <span class="status-indicator-dot" id="conn-indicator-dot"></span>
+            <span id="conn-status-label">Ready to connect</span>
+          </div>
+
+          <button id="invite-partner-btn" class="primary-btn w-full mt-3">
+            💬 Send Invite Link to Partner on WhatsApp
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main App Shell -->
+  <div id="app-container" class="app-wrapper">
+    <!-- Top Bar -->
+    <header class="app-header">
+      <div class="header-left">
+        <span class="app-gem">✦</span>
+        <div class="brand-info">
+          <h1 class="brand-title">Velvet & Vow</h1>
+          <p class="brand-subtitle" id="device-mode-badge">Shared Device Mode</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button id="pair-mode-btn" class="icon-btn pair-btn" title="Phone Sync Mode" aria-label="Phone Sync Mode">
+          <span id="pair-icon">📲</span>
+        </button>
+        <button id="sound-toggle-btn" class="icon-btn" title="Toggle Sound FX" aria-label="Toggle Sound">
+          <span id="sound-icon">🔊</span>
+        </button>
+        <button id="stealth-mode-btn" class="icon-btn stealth-btn" title="Discreet Stealth Mode" aria-label="Stealth Mode">
+          <span>🛡️</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Couple Quick Status & Daily Kiss Goal Banner -->
+    <section class="intimacy-ribbon">
+      <div class="ribbon-card">
+        <div class="ribbon-text">
+          <span class="ribbon-badge">Today's Sacred Rule</span>
+          <p id="daily-intimacy-nudge" class="nudge-quote">"A 30-second kiss releases oxytocin and reminds her she is desired, not just a partner."</p>
+        </div>
+        <button id="quick-kiss-cta" class="ribbon-cta-btn">Start Kiss Melt 💋</button>
+      </div>
+    </section>
+
+    <!-- Main Content Tabs Area -->
+    <main class="app-main">
+      <!-- TAB 1: GREEN LIGHT & RADAR -->
+      <section id="tab-radar" class="tab-pane active">
+        <div class="section-heading">
+          <h2>Green Light Radar 🚦</h2>
+          <p>End the waiting stalemate. Signal your mood without awkwardness or fear of rejection.</p>
+        </div>
+
+        <div class="radar-card-grid">
+          <!-- Husband Mood -->
+          <div class="radar-box" id="husband-radar-box">
+            <div class="role-tag">Husband's Signal</div>
+            <div class="mood-selector" data-role="husband">
+              <button class="mood-pill" data-mood="fire">🔥 In The Mood</button>
+              <button class="mood-pill" data-mood="kiss">💋 Craving Kisses & Touch</button>
+              <button class="mood-pill" data-mood="massage">💆 Want to Pamper Her</button>
+              <button class="mood-pill" data-mood="cuddle">🧸 Gentle Cuddles Only</button>
+              <button class="mood-pill" data-mood="sleep">💤 Exhausted Tonight</button>
+            </div>
+            <div class="current-mood-status" id="husband-mood-display">Status: <i>Not set yet</i></div>
+          </div>
+
+          <!-- Wife Mood -->
+          <div class="radar-box" id="wife-radar-box">
+            <div class="role-tag">Her Signal</div>
+            <div class="mood-selector" data-role="wife">
+              <button class="mood-pill" data-mood="fire">🔥 Craving Passion</button>
+              <button class="mood-pill" data-mood="kiss">💋 Seduce Me Slowly</button>
+              <button class="mood-pill" data-mood="massage">💆 Need a Back/Foot Rub</button>
+              <button class="mood-pill" data-mood="cuddle">🧸 Hold Me Close</button>
+              <button class="mood-pill" data-mood="sleep">💤 Just Rest & Hugs</button>
+            </div>
+            <div class="current-mood-status" id="wife-mood-display">Status: <i>Not set yet</i></div>
+          </div>
+        </div>
+
+        <!-- Radar Match Alert Banner -->
+        <div id="radar-match-box" class="match-banner hidden">
+          <div class="match-sparkle">✨ MATCH DETECTED ✨</div>
+          <h3 id="match-headline">Tonight Is Your Night!</h3>
+          <p id="match-recommendation">Both of you want intimacy. No waiting or second-guessing: go straight in for a slow 60-second kiss right now.</p>
+          <button id="match-act-btn" class="primary-btn pulse-glow">Begin Tonight's Journey 🍷</button>
+        </div>
+
+        <!-- WHO INITIATES WHEEL -->
+        <div class="feature-card mt-6">
+          <div class="card-header-row">
+            <div>
+              <h3>Who Takes The Lead Tonight? 🎲</h3>
+              <p class="card-sub">Let fate decide so neither person feels hesitant.</p>
+            </div>
+          </div>
+
+          <div class="wheel-stage">
+            <div class="wheel-pointer">▼</div>
+            <div id="initiator-wheel" class="wheel-disc">
+              <div class="wheel-sector s1">Husband Initiates</div>
+              <div class="wheel-sector s2">Wife Takes Charge</div>
+              <div class="wheel-sector s3">Slow Mutual Melt</div>
+              <div class="wheel-sector s4">Husband Pampering</div>
+            </div>
+          </div>
+
+          <button id="spin-wheel-btn" class="secondary-btn w-full mt-4">Spin The Wheel of Desire</button>
+          <div id="wheel-result-box" class="result-callout hidden">
+            <span class="callout-icon">👑</span>
+            <div id="wheel-result-text">Spin to find out who takes charge!</div>
+          </div>
+        </div>
+
+        <!-- GENTLE DIRECTOR FOR SUBMISSIVE COUPLES -->
+        <div class="feature-card mt-6 director-card">
+          <div class="card-header-row">
+            <div>
+              <span class="ribbon-badge">Zero Hesitation Mode</span>
+              <h3>The Gentle Director 🕊️</h3>
+              <p class="card-sub">When both of you are submissive, neither has to be dominant. Follow these gentle, guided steps together.</p>
+            </div>
+          </div>
+
+          <div class="director-steps mt-3">
+            <div class="director-step-box">
+              <span class="d-step-num">Step 1</span>
+              <h4>Dim All The Lights</h4>
+              <p>Turn off overhead lights. Light a single candle or keep only a warm amber bedside lamp. Darkness dissolves shyness instantly.</p>
+            </div>
+            <div class="director-step-box">
+              <span class="d-step-num">Step 2</span>
+              <h4>Side-by-Side Touch (No Talking)</h4>
+              <p>Lie on your backs next to each other on the bed. Interlock your fingers and hold hands for 60 seconds without speaking. Feel each other's pulse.</p>
+            </div>
+            <div class="director-step-box">
+              <span class="d-step-num">Step 3</span>
+              <h4>The Husband's Gentle Worship</h4>
+              <p>Husband turns on his side facing her. He kisses the back of her hand, then her wrist, and rests his hand softly on her waist. She simply closes her eyes and breathes.</p>
+            </div>
+            <div class="director-step-box">
+              <span class="d-step-num">Step 4</span>
+              <h4>The 60-Second Kiss Command</h4>
+              <p>Without asking or overthinking, let your lips meet for a slow, gentle kiss. Let the app take the blame: "The app says we have to kiss now!"</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: SAREE & GODDESS QUEST -->
+      <section id="tab-saree" class="tab-pane">
+        <div class="section-heading">
+          <h2>Saree & Goddess Quest 🥻</h2>
+          <p>When she wears a saree or dresses bold, she isn't just getting dressed—she is a Goddess who gets pampered, adored, and rewarded.</p>
+        </div>
+
+        <!-- The Goddess Check-in Trigger -->
+        <div class="hero-feature-card saree-hero">
+          <div class="saree-hero-badge">ROYAL PRIVILEGE</div>
+          <h3>Is She Wearing a Saree or Bold Dress Right Now?</h3>
+          <p>Tap here whenever she puts on a saree or dresses up. Unlock instant praise, royal favor tokens, and pampering vouchers.</p>
+          
+          <div class="saree-dress-buttons">
+            <button id="saree-draped-btn" class="goddess-btn saree-theme">
+              <span class="btn-emoji">🥻</span>
+              <span class="btn-label">She is in a Saree!</span>
+              <span class="btn-sub">+100 Goddess Gems</span>
+            </button>
+            <button id="bold-dress-btn" class="goddess-btn bold-theme">
+              <span class="btn-emoji">✨</span>
+              <span class="btn-label">She is in a Bold Dress!</span>
+              <span class="btn-sub">+100 Goddess Gems</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Goddess Celebration Modal / Reveal Box -->
+        <div id="saree-celebration-box" class="celebration-card hidden">
+          <div class="celebration-badge">👑 QUEEN ENTERING THE ROOM</div>
+          <h3>Husband's Immediate Action Required:</h3>
+          <div class="compliment-highlight-card">
+            <span class="quote-mark">“</span>
+            <p id="spontaneous-saree-compliment">"You take my breath away in that saree. The way the pallu rests on your shoulder and shows your waist... you are pure royalty."</p>
+          </div>
+          <div class="tribute-perks">
+            <h4>Her Automatic Royal Perks Tonight:</h4>
+            <ul>
+              <li>💆 <b>15-Minute Queen Foot or Back Rub</b> (Guaranteed)</li>
+              <li>📸 <b>Private Flattering Photoshoot</b> (Husband takes 5 gorgeous, sensual photos of her)</li>
+              <li>🍷 <b>Zero Household Chores Tonight</b></li>
+            </ul>
+          </div>
+          <button id="start-undraping-guide-btn" class="primary-btn w-full mt-3">Start Sensual Saree Undraping Ritual 🕯️</button>
+        </div>
+
+        <!-- Interactive Sensual Saree Ritual Guide -->
+        <div class="feature-card mt-6">
+          <h3>The Sensual Saree Ritual (5 Steps) 🕯️</h3>
+          <p class="card-sub">Turn undraping the saree into an intimate art form instead of a routine change of clothes.</p>
+          
+          <div class="ritual-steps-container">
+            <div class="ritual-step active" data-step="1">
+              <div class="step-num">1</div>
+              <div class="step-body">
+                <h4>The 360° Adoration Walk</h4>
+                <p>Have her stand in front of you. Take 30 seconds to walk slowly around her, lightly touching the silk fabric, admiring her posture and curves without rushing.</p>
+              </div>
+            </div>
+            <div class="ritual-step" data-step="2">
+              <div class="step-num">2</div>
+              <div class="step-body">
+                <h4>The Pallu Release</h4>
+                <p>Gently reach for the safety pin on her left shoulder. Remove it slowly, letting the pallu cascade into your hands. Whisper in her ear how beautiful she feels.</p>
+              </div>
+            </div>
+            <div class="ritual-step" data-step="3">
+              <div class="step-num">3</div>
+              <div class="step-body">
+                <h4>The Exposed Waist Caress</h4>
+                <p>The beauty of a saree is the curves of her midriff. Place both warm hands lightly on her waist. Kiss her neck, then place gentle lips right against her bare side.</p>
+              </div>
+            </div>
+            <div class="ritual-step" data-step="4">
+              <div class="step-num">4</div>
+              <div class="step-body">
+                <h4>Pleat by Pleat Tease</h4>
+                <p>Kneel or sit before her. Untuck the pleats one fold at a time, looking up into her eyes with pure admiration. Never rush—let the anticipation build.</p>
+              </div>
+            </div>
+            <div class="ritual-step" data-step="5">
+              <div class="step-num">5</div>
+              <div class="step-body">
+                <h4>Worshipping The Goddess</h4>
+                <p>Now only in her petticoat and blouse, embrace her warmly skin-to-skin. A deep 1-minute kiss before moving anywhere further.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Wardrobe Vibe Roulette -->
+        <div class="feature-card mt-6">
+          <h3>Wardrobe Vibe Roulette 👗</h3>
+          <p class="card-sub">When she doesn't know what to wear, let the mystery spinner pick her alluring attire for tonight.</p>
+          <div class="roulette-box">
+            <div id="wardrobe-result-card" class="wardrobe-display">
+              <span class="wardrobe-icon">🥻</span>
+              <h4 id="wardrobe-name">Royal Silk Saree & Deep Neck Blouse</h4>
+              <p id="wardrobe-desc">Drape her favorite color saree. Pair with delicate earrings and bold lipstick.</p>
+            </div>
+            <button id="spin-wardrobe-btn" class="secondary-btn w-full mt-3">🎲 Spin Her Next Look</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: KISS & TOUCH LAB -->
+      <section id="tab-kiss" class="tab-pane">
+        <div class="section-heading">
+          <h2>Kiss & Touch Lab 💋</h2>
+          <p>Rebuilding deep intimacy starts with kissing without the pressure of having sex immediately. Melt into each other.</p>
+        </div>
+
+        <!-- The Touch Timer -->
+        <div class="timer-card">
+          <div class="timer-header">
+            <span id="timer-ritual-title">The 60-Second Deep Melt Kiss</span>
+            <span class="timer-mode-tag">Low Pressure • Pure Chemistry</span>
+          </div>
+          
+          <div class="timer-display-wrap">
+            <div class="pulse-ring" id="pulse-animation-ring"></div>
+            <div class="timer-digits" id="timer-display">01:00</div>
+            <div class="timer-guide-sub" id="timer-instructions">Close your eyes. Put your hands on her hips, let her wrap her arms around your neck. Slow, soft lips only.</div>
+          </div>
+
+          <div class="timer-controls">
+            <button id="start-timer-btn" class="primary-btn glow-btn">Start Intimacy Timer</button>
+            <button id="reset-timer-btn" class="ghost-btn">Reset</button>
+          </div>
+
+          <!-- Pre-set Ritual Buttons -->
+          <div class="ritual-presets">
+            <button class="preset-chip active" data-time="60" data-title="The 60-Second Deep Melt Kiss" data-instruct="Close your eyes. Hands on her hips, arms around neck. No rush, slow deep lips only.">60s Deep Melt</button>
+            <button class="preset-chip" data-time="30" data-title="The 30-Second Forehead & Eye Kiss" data-instruct="Hold her face gently in both hands. Kiss her forehead, her eyelids, then her nose. Make her feel safe and adored.">30s Eye Melt</button>
+            <button class="preset-chip" data-time="90" data-title="The Collarbone & Neck Whisper" data-instruct="Husband kisses the side of her neck down to her collarbone while whispering what he loves most about her body.">90s Neck Trace</button>
+            <button class="preset-chip" data-time="120" data-title="2-Minute Hug & Breathing Sync" data-instruct="Hold each other tight chest-to-chest. Match your breathing rhythm. Melt all daily stress away.">2-Min Heart Sync</button>
+            <button class="preset-chip" data-time="45" data-title="The Saree Waistline Kiss" data-instruct="Husband kisses along her bare waistline and curve of her back, breathing softly against her skin.">45s Waistline Touch</button>
+          </div>
+        </div>
+
+        <!-- SHY GODDESS & NERVOUSNESS MELTER -->
+        <div class="feature-card mt-6 shy-ritual-card">
+          <div class="card-header-row">
+            <div>
+              <span class="ribbon-badge">For Shy & Nervous Moments</span>
+              <h3>The Nervousness Melter 🕊️</h3>
+              <p class="card-sub">When she feels nervous face-to-face, eye contact can feel intimidating. Use these 3 proven techniques:</p>
+            </div>
+          </div>
+          
+          <div class="shy-tips-list mt-3">
+            <div class="shy-tip-item">
+              <span class="tip-icon">🙈</span>
+              <div>
+                <h4>1. The Silk Blindfold / Eyes Closed Sanctuary</h4>
+                <p>Have her tie a soft silk scarf over her eyes or simply close them. When she can't see, all self-consciousness vanishes! She doesn't have to worry about how she looks, and her sense of touch multiplies 10x.</p>
+              </div>
+            </div>
+            <div class="shy-tip-item">
+              <span class="tip-icon">🫂</span>
+              <div>
+                <h4>2. The Back-Facing Cuddle (The Safe Haven)</h4>
+                <p>Have her lie down on her side facing away from you (spooning position). No face-to-face pressure. Husband kisses the nape of her neck and shoulders from behind. It feels safe, deeply erotic, and zero nervousness.</p>
+              </div>
+            </div>
+            <div class="shy-tip-item">
+              <span class="tip-icon">👑</span>
+              <div>
+                <h4>3. The "Zero Performance" Rule</h4>
+                <p>Say these exact words to her: <i>"Tonight you don't need to do a single thing or act confident. You are my Goddess—all you have to do is lie here and let me worship you."</i></p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Kiss Streak Tracker -->
+        <div class="feature-card mt-6">
+          <div class="streak-row">
+            <div class="streak-info">
+              <h3>Our Passion & Kiss Streak</h3>
+              <p>Target: At least one conscious, romantic 30-second kiss every single day.</p>
+            </div>
+            <div class="streak-counter">
+              <span class="streak-num" id="kiss-streak-count">1</span>
+              <span class="streak-label">DAYS STREAK</span>
+            </div>
+          </div>
+          <button id="log-kiss-btn" class="secondary-btn w-full mt-3">❤️ We Kissed Today! (Check In)</button>
+        </div>
+      </section>
+
+      <!-- TAB 4: COMPLIMENT & FLIRT VAULT -->
+      <section id="tab-praise" class="tab-pane">
+        <div class="section-heading">
+          <h2>Goddess Praise & Flirt Vault 💎</h2>
+          <p>Women bloom when they feel intensely desired. Here is your arsenal of genuine, heart-melting compliments to praise her looks, curves, and aura.</p>
+        </div>
+
+        <!-- Daily 3 Compliments Checklist for Him -->
+        <div class="feature-card checklist-card">
+          <div class="checklist-header">
+            <h3>Husband's Daily Praise Goal (0/3 Completed)</h3>
+            <span class="checklist-badge">Daily Fuel</span>
+          </div>
+          <p class="card-sub">Deliver at least 3 genuine compliments today before bedtime:</p>
+          
+          <div class="compliment-tasks">
+            <label class="task-item">
+              <input type="checkbox" id="praise-task-1" class="task-checkbox">
+              <span class="task-text"><b>Morning Admiration:</b> Compliment her morning hair, natural smile, or eyes.</span>
+            </label>
+            <label class="task-item">
+              <input type="checkbox" id="praise-task-2" class="task-checkbox">
+              <span class="task-text"><b>Body & Allure:</b> Compliment her curves, her waist, lips, or the way she smells.</span>
+            </label>
+            <label class="task-item">
+              <input type="checkbox" id="praise-task-3" class="task-checkbox">
+              <span class="task-text"><b>Clothing & Seduction:</b> Praise her dress, saree draping, or tell her how irresistible she looks to you.</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Filterable Compliments Generator -->
+        <div class="feature-card mt-6">
+          <h3>Instant Praise Generator</h3>
+          <p class="card-sub">Select the vibe, generate a heartfelt compliment, whisper it or tap to copy for WhatsApp!</p>
+
+          <div class="category-tabs">
+            <button class="cat-chip active" data-cat="saree">Saree & Glamour 🥻</button>
+            <button class="cat-chip" data-cat="body">Curves & Waistline ⏳</button>
+            <button class="cat-chip" data-cat="face">Eyes, Lips & Smile 👄</button>
+            <button class="cat-chip" data-cat="bold">Bold & Seductive 🔥</button>
+            <button class="cat-chip" data-cat="sweet">Deep Romance & Soul 🌹</button>
+          </div>
+
+          <div class="compliment-card-display" id="compliment-card-display">
+            <div class="card-quote-icon">“</div>
+            <p id="generated-compliment-text">"When you drape a saree, the entire atmosphere shifts. You carry it with such effortless grace and raw sensuality that I literally lose track of what I was doing."</p>
+            <div class="compliment-author-tag">— For Her Ears Tonight</div>
+          </div>
+
+          <div class="compliment-actions">
+            <button id="new-compliment-btn" class="primary-btn flex-1">Generate Another ✨</button>
+            <button id="whatsapp-compliment-btn" class="secondary-btn" title="Send to Her WhatsApp">💬 Send to WhatsApp</button>
+            <button id="copy-compliment-btn" class="secondary-btn">📋 Copy</button>
+            <button id="speak-compliment-btn" class="secondary-btn" title="Whisper Audio">🗣️ Speak</button>
+          </div>
+        </div>
+
+        <!-- The Chat-to-Bedroom Bridge for Shy Couples -->
+        <div class="feature-card mt-6 bridge-card">
+          <div class="card-header-row">
+            <div>
+              <h3>💬 Chat-to-Bedroom Bridge</h3>
+              <p class="card-sub">When she's shy face-to-face but bold in chat, text her these pre-written messages to warm her up before bedtime!</p>
+            </div>
+          </div>
+          <div class="chat-starters-grid mt-3">
+            <div class="chat-starter-item">
+              <p class="starter-text">"You don't have to do anything tonight. Just put on that saree or soft robe, lie down, and let me worship you. Zero expectations, only pampering. ❤️"</p>
+              <button class="ghost-btn send-starter-btn" data-text="You don't have to do anything tonight. Just put on that saree or soft robe, lie down, and let me worship you. Zero expectations, only pampering. ❤️">Send to Chat 📲</button>
+            </div>
+            <div class="chat-starter-item">
+              <p class="starter-text">"I can't stop thinking about how breathtaking your waist looks in a saree. You are so gorgeous to me, even when you don't realize it."</p>
+              <button class="ghost-btn send-starter-btn" data-text="I can't stop thinking about how breathtaking your waist looks in a saree. You are so gorgeous to me, even when you don't realize it.">Send to Chat 📲</button>
+            </div>
+            <div class="chat-starter-item">
+              <p class="starter-text">"If you're feeling a little shy tonight, let's turn off the main lights and just kiss in the dark with no pressure. Deal? 💋"</p>
+              <button class="ghost-btn send-starter-btn" data-text="If you're feeling a little shy tonight, let's turn off the main lights and just kiss in the dark with no pressure. Deal? 💋">Send to Chat 📲</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Custom Compliments Vault -->
+        <div class="feature-card mt-6">
+          <h3>Add Your Own Private Compliments</h3>
+          <p class="card-sub">Save specific things she loves hearing about herself so you never forget.</p>
+          <div class="add-compliment-row">
+            <input type="text" id="custom-compliment-input" placeholder="e.g., 'That black bindi on your forehead drives me crazy...'" class="custom-input">
+            <button id="save-custom-compliment-btn" class="secondary-btn">Save</button>
+          </div>
+          <div id="custom-compliments-list" class="custom-praise-list mt-3"></div>
+        </div>
+      </section>
+
+      <!-- TAB 5: SCRATCH CARDS & SPICY DARES -->
+      <section id="tab-dares" class="tab-pane">
+        <div class="section-heading">
+          <h2>Desire Scratch Cards & Dares 🎲</h2>
+          <p>Scratch with your finger to reveal sweet romance, sensual foreplay, or spicy bedroom games.</p>
+        </div>
+
+        <!-- Intensity Switcher -->
+        <div class="intensity-picker">
+          <button class="intensity-btn active" data-level="mild">🌸 Tier 1: Sweet & Romantic</button>
+          <button class="intensity-btn" data-level="medium">🔥 Tier 2: Sensual Heat</button>
+          <button class="intensity-btn" data-level="wild">🌶️ Tier 3: Bold & Spicy</button>
+        </div>
+
+        <!-- The Scratch Card Component -->
+        <div class="scratch-card-container">
+          <div class="scratch-card-box">
+            <!-- Hidden Secret Content Below -->
+            <div class="scratch-secret-content" id="scratch-secret-content">
+              <span class="secret-emoji" id="scratch-secret-emoji">💋</span>
+              <h4 id="scratch-secret-title">The Slow Unbuttoning</h4>
+              <p id="scratch-secret-desc">Husband unbuttons or undrapes one article of her clothing while giving her 3 slow kisses on her neck and shoulders.</p>
+            </div>
+            <!-- Canvas Overlay for Scratching -->
+            <canvas id="scratch-canvas" class="scratch-canvas" width="340" height="200"></canvas>
+          </div>
+          <div class="scratch-instructions">Rub with your finger or mouse to reveal your intimate dare!</div>
+          <button id="new-scratch-card-btn" class="secondary-btn mt-3">🃏 Draw New Secret Card</button>
+        </div>
+
+        <!-- Couple Truth or Dare Prompts -->
+        <div class="feature-card mt-6">
+          <h3>Sensual Truth or Dare 🍷</h3>
+          <p class="card-sub">Playful bedroom Q&A designed to break inhibitions and open up communication.</p>
+          <div class="tod-buttons">
+            <button id="tod-truth-btn" class="primary-btn flex-1">Ask Sensual Truth 💬</button>
+            <button id="tod-dare-btn" class="secondary-btn flex-1">Give Spicy Dare 😈</button>
+          </div>
+          <div id="tod-display-card" class="tod-display hidden">
+            <span id="tod-type-badge" class="tod-badge">TRUTH</span>
+            <p id="tod-text">What is the most attractive thing I wear that immediately turns you on in secret?</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 6: FANTASY & IMAGINATION LOUNGE -->
+      <section id="tab-fantasy" class="tab-pane">
+        <div class="section-heading">
+          <h2>Imagination & Fantasy Lounge 🔥</h2>
+          <p>Explore thrilling erotic imagination, bold dress admiration, and whispered "what if" scenarios in complete safety and mutual love.</p>
+        </div>
+
+        <div class="hero-feature-card fantasy-hero">
+          <div class="saree-hero-badge">SAFE FANTASY SPACE</div>
+          <h3>Pillow Talk & Erotic Scenarios</h3>
+          <p>Sensual imagination ignites deeper passion between husband and wife. These prompts are crafted to build intense excitement, worshipping her desirability and exploring bold fantasies together.</p>
+        </div>
+
+        <!-- Fantasy Prompt Deck -->
+        <div class="feature-card mt-6">
+          <div class="card-header-row">
+            <div>
+              <h3>Whispered Scenario Deck 🃏</h3>
+              <p class="card-sub">Draw a card and read it together softly under the covers.</p>
+            </div>
+            <button id="draw-fantasy-btn" class="ghost-btn">Draw Card 🎲</button>
+          </div>
+
+          <div id="fantasy-card-box" class="fantasy-display-box">
+            <span class="fantasy-tag" id="fantasy-category-tag">Bold Queen Fantasy</span>
+            <h4 id="fantasy-scenario-title">"The Center of Attention"</h4>
+            <p id="fantasy-scenario-body">"Imagine we are attending an elite private party. You are wearing the boldest, most stunning dress in your wardrobe. As you walk into the room, every conversation pauses. Every person looks at you with intense desire—and I lean in, whisper in your ear: 'They can only look, but tonight you belong entirely to me.'"</p>
+            <div class="fantasy-question-prompt">
+              <b>Conversation Spark:</b> <span id="fantasy-spark-text">How does it feel to know how deeply you are desired? Which dress would you pick for this?</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hotwife & Imagination Playground -->
+        <div class="feature-card mt-6">
+          <h3>The Queen's Tease & Adoration 👑</h3>
+          <p class="card-sub">Celebrating her allure as an irresistible woman who commands desire.</p>
+          
+          <div class="tease-prompts-grid">
+            <div class="tease-card">
+              <h4>👠 Bold Dress Catwalk</h4>
+              <p>Husband sits at the foot of the bed. Wife puts on high heels and her boldest dress or saree. She walks slowly like a high-fashion runway model while he showers her with unfiltered praise.</p>
+            </div>
+            <div class="tease-card">
+              <h4>📸 The VIP Secret Photos</h4>
+              <p>She poses for 3 private, artistic photos on the bed. Husband acts as her personal celebrity photographer, capturing her confidence and curves from her best angles.</p>
+            </div>
+            <div class="tease-card">
+              <h4>🍷 The 'What If' Whisper</h4>
+              <p>While cuddling in the dark, husband whispers: "If you could wear anything daring in public with me holding your hand, what would be your wildest choice?"</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mutual Wishlist & Confession Jar -->
+        <div class="feature-card mt-6">
+          <h3>Secret Wishlist Jar 💌</h3>
+          <p class="card-sub">Drop a desire or fantasy you've been shy to say out loud. Both can add notes anytime.</p>
+          <div class="add-wish-row">
+            <input type="text" id="new-wish-input" placeholder="e.g., 'Wear the red saree with open hair and let me undress you slowly'" class="custom-input">
+            <button id="add-wish-btn" class="primary-btn">Drop in Jar 🍯</button>
+          </div>
+          <div id="wishes-container" class="wishes-list mt-3"></div>
+        </div>
+      </section>
+
+      <!-- TAB 7: COUPLE LOVE COUPONS -->
+      <section id="tab-coupons" class="tab-pane">
+        <div class="section-heading">
+          <h2>Couple Love Coupons 🎟️</h2>
+          <p>Redeemable romantic vouchers for back rubs, saree royal treatments, foot massages, and passionate nights.</p>
+        </div>
+
+        <div class="coupons-grid" id="coupons-grid">
+          <!-- Dynamically populated or rich default vouchers -->
+        </div>
+
+        <div class="feature-card mt-6">
+          <h3>Create a Custom Couple Coupon</h3>
+          <p class="card-sub">Surprise your spouse with a personalized promise.</p>
+          <div class="coupon-creator-form">
+            <input type="text" id="coupon-title-input" placeholder="Coupon Name (e.g. 30-min Foot Massage)" class="custom-input mb-2">
+            <input type="text" id="coupon-desc-input" placeholder="Terms (e.g. Valid anytime she asks, no excuses!)" class="custom-input mb-2">
+            <button id="create-coupon-btn" class="primary-btn w-full">Gift New Coupon 🎁</button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Bottom Mobile Navigation Bar -->
+    <nav class="bottom-nav">
+      <button class="nav-tab active" data-target="tab-radar">
+        <span class="nav-icon">🚦</span>
+        <span class="nav-label">Radar</span>
+      </button>
+      <button class="nav-tab" data-target="tab-saree">
+        <span class="nav-icon">🥻</span>
+        <span class="nav-label">Saree</span>
+      </button>
+      <button class="nav-tab" data-target="tab-kiss">
+        <span class="nav-icon">💋</span>
+        <span class="nav-label">Kiss Lab</span>
+      </button>
+      <button class="nav-tab" data-target="tab-praise">
+        <span class="nav-icon">💎</span>
+        <span class="nav-label">Praise</span>
+      </button>
+      <button class="nav-tab" data-target="tab-dares">
+        <span class="nav-icon">🎲</span>
+        <span class="nav-label">Dares</span>
+      </button>
+      <button class="nav-tab" data-target="tab-fantasy">
+        <span class="nav-icon">🔥</span>
+        <span class="nav-label">Fantasy</span>
+      </button>
+      <button class="nav-tab" data-target="tab-coupons">
+        <span class="nav-icon">🎟️</span>
+        <span class="nav-label">Coupons</span>
+      </button>
+    </nav>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
