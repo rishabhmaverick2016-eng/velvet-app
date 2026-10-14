@@ -118,6 +118,39 @@
     </div>
   </div>
 
+  <!-- Settings & Security Modal -->
+  <div id="settings-modal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>⚙️ Security & PIN Settings</h3>
+        <button id="close-settings-modal-btn" class="ghost-btn">✕</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-sub">Customize your private couple PIN and privacy settings.</p>
+        
+        <div class="form-group mt-3 mb-3">
+          <label class="form-label">Set New 4-Digit PIN:</label>
+          <div class="code-input-row">
+            <input type="password" id="new-pin-input" class="custom-input" placeholder="e.g. 5678" maxlength="4" inputmode="numeric">
+            <button id="save-new-pin-btn" class="primary-btn">Save PIN</button>
+          </div>
+          <p id="current-pin-reminder" class="card-sub mt-1">Current PIN: <b>1234</b></p>
+        </div>
+
+        <div class="form-group mb-3">
+          <label class="task-item">
+            <input type="checkbox" id="require-pin-toggle" class="task-checkbox" checked>
+            <span class="task-text"><b>Require PIN on launch:</b> Always ask for PIN when opening app.</span>
+          </label>
+        </div>
+
+        <div class="form-group mt-4">
+          <button id="modal-lock-now-btn" class="secondary-btn w-full">🔒 Lock App Immediately</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Main App Shell -->
   <div id="app-container" class="app-wrapper">
     <!-- Top Bar -->
@@ -130,6 +163,12 @@
         </div>
       </div>
       <div class="header-actions">
+        <button id="settings-btn" class="icon-btn" title="Settings & Change PIN" aria-label="Settings">
+          <span>⚙️</span>
+        </button>
+        <button id="lock-now-btn" class="icon-btn" title="Lock App Now" aria-label="Lock App Now">
+          <span>🔒</span>
+        </button>
         <button id="pair-mode-btn" class="icon-btn pair-btn" title="Phone Sync Mode" aria-label="Phone Sync Mode">
           <span id="pair-icon">📲</span>
         </button>

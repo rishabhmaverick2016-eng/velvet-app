@@ -1599,6 +1599,77 @@ function initPasscodeGate() {
       if (overlay) overlay.classList.remove('hidden');
     });
   }
+
+  // --- SETTINGS & PIN MANAGEMENT ---
+  const settingsBtn = document.getElementById('settings-btn');
+  const settingsModal = document.getElementById('settings-modal');
+  const closeSettingsBtn = document.getElementById('close-settings-modal-btn');
+  const newPinInput = document.getElementById('new-pin-input');
+  const saveNewPinBtn = document.getElementById('save-new-pin-btn');
+  const currentPinReminder = document.getElementById('current-pin-reminder');
+  const requirePinToggle = document.getElementById('require-pin-toggle');
+  const lockNowBtn = document.getElementById('lock-now-btn');
+  const modalLockNowBtn = document.getElementById('modal-lock-now-btn');
+
+  function updatePinReminder() {
+    if (currentPinReminder) {
+      currentPinReminder.innerHTML = `Current PIN: <b>${appState.userPin || '1234'}</b>`;
+    }
+    if (requirePinToggle) {
+      requirePinToggle.checked = appState.pinLockEnabled !== false;
+    }
+  }
+
+  function lockAppNow() {
+    sound.playChime('soft');
+    sessionStorage.removeItem('velvet_unlocked');
+    gate.classList.remove('unlocked');
+    if (settingsModal) settingsModal.classList.add('hidden');
+    enteredPin = '';
+    updateDots();
+    showToast('App Locked 🔒');
+  }
+
+  if (settingsBtn && settingsModal) {
+    settingsBtn.addEventListener('click', () => {
+      sound.playChime('soft');
+      updatePinReminder();
+      settingsModal.classList.remove('hidden');
+    });
+  }
+
+  if (closeSettingsBtn && settingsModal) {
+    closeSettingsBtn.addEventListener('click', () => {
+      settingsModal.classList.add('hidden');
+    });
+  }
+
+  if (saveNewPinBtn && newPinInput) {
+    saveNewPinBtn.addEventListener('click', () => {
+      const pin = newPinInput.value.trim();
+      if (pin.length !== 4 || isNaN(pin)) {
+        showToast('Please enter a 4-digit number (e.g. 5678)');
+        return;
+      }
+      appState.userPin = pin;
+      saveState(appState);
+      newPinInput.value = '';
+      updatePinReminder();
+      sound.playChime('celebrate');
+      showToast(`New PIN Saved: ${pin} 🔑`);
+    });
+  }
+
+  if (requirePinToggle) {
+    requirePinToggle.addEventListener('change', () => {
+      appState.pinLockEnabled = requirePinToggle.checked;
+      saveState(appState);
+      showToast(requirePinToggle.checked ? 'PIN Protection Active' : 'PIN Protection Disabled');
+    });
+  }
+
+  if (lockNowBtn) lockNowBtn.addEventListener('click', lockAppNow);
+  if (modalLockNowBtn) modalLockNowBtn.addEventListener('click', lockAppNow);
 }
 
 
