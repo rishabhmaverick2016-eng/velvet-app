@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=3">
   <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <body>
   <!-- Private Passcode Security Gate (Protects your app anywhere on the internet) -->
@@ -199,6 +199,15 @@
         <div class="section-heading">
           <h2>Green Light Radar 🚦</h2>
           <p>End the waiting stalemate. Signal your mood without awkwardness or fear of rejection.</p>
+        </div>
+
+        <!-- Quick PIN & Settings Access -->
+        <div class="feature-card mt-2 mb-4" style="padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; background: rgba(229, 185, 102, 0.08); border-color: rgba(229, 185, 102, 0.25);">
+          <div>
+            <span style="font-size: 0.88rem; font-weight: 600; color: #fff;">🔒 Security & PIN Settings</span>
+            <p style="font-size: 0.75rem; color: var(--text-secondary); margin: 0;">Change 4-digit PIN code & app security</p>
+          </div>
+          <button id="inline-settings-btn" class="secondary-btn" style="padding: 6px 14px; font-size: 0.78rem;">⚙️ Change PIN</button>
         </div>
 
         <div class="radar-card-grid">
@@ -702,7 +711,48 @@
         </div>
 
         <div class="coupons-grid" id="coupons-grid">
-          <!-- Dynamically populated or rich default vouchers -->
+          <div class="coupon-ticket" data-id="c1">
+            <div class="coupon-left">
+              <h4>💆‍♀️ 20-Min Foot & Ankle Massage</h4>
+              <p>Warm lotion, slow relaxing strokes, zero effort from her.</p>
+            </div>
+            <button class="coupon-redeem-btn" data-id="c1">Redeem Now</button>
+          </div>
+          <div class="coupon-ticket" data-id="c2">
+            <div class="coupon-left">
+              <h4>🥻 Royal Saree Goddess Night</h4>
+              <p>She wears a saree; husband gives full adoration & undraping ritual.</p>
+            </div>
+            <button class="coupon-redeem-btn" data-id="c2">Redeem Now</button>
+          </div>
+          <div class="coupon-ticket" data-id="c3">
+            <div class="coupon-left">
+              <h4>💋 10-Minute Pure Kissing Session</h4>
+              <p>Just slow kisses and embraces in bed without rush to have sex.</p>
+            </div>
+            <button class="coupon-redeem-btn" data-id="c3">Redeem Now</button>
+          </div>
+          <div class="coupon-ticket" data-id="c4">
+            <div class="coupon-left">
+              <h4>👑 Queen's Breakfast/Dinner in Bed</h4>
+              <p>Husband serves her favorite meal and cleans up all dishes.</p>
+            </div>
+            <button class="coupon-redeem-btn" data-id="c4">Redeem Now</button>
+          </div>
+          <div class="coupon-ticket" data-id="c5">
+            <div class="coupon-left">
+              <h4>🕯️ Safe Haven Dark Cuddle</h4>
+              <p>Hold each other in complete darkness with zero performance pressure.</p>
+            </div>
+            <button class="coupon-redeem-btn" data-id="c5">Redeem Now</button>
+          </div>
+          <div class="coupon-ticket" data-id="c6">
+            <div class="coupon-left">
+              <h4>📸 Private Glamour Photoshoot</h4>
+              <p>Husband takes 5 gorgeous, sensual photos capturing her curves.</p>
+            </div>
+            <button class="coupon-redeem-btn" data-id="c6">Redeem Now</button>
+          </div>
         </div>
 
         <div class="feature-card mt-6">
@@ -747,9 +797,13 @@
         <span class="nav-icon">🎟️</span>
         <span class="nav-label">Coupons</span>
       </button>
+      <button class="nav-tab" id="nav-settings-tab">
+        <span class="nav-icon">⚙️</span>
+        <span class="nav-label">Settings</span>
+      </button>
     </nav>
   </div>
 
-  <script src="app.js"></script>
+  <script src="app.js?v=3"></script>
 </body>
 </html>

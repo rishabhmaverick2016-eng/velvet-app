@@ -1049,9 +1049,15 @@ function initCoupons() {
 
   function renderCoupons() {
     if (!couponsGrid) return;
+
+    const allCoupons = [
+      ...INITIAL_COUPONS,
+      ...(appState.customCoupons || [])
+    ];
+
     couponsGrid.innerHTML = '';
 
-    INITIAL_COUPONS.forEach(coupon => {
+    allCoupons.forEach(coupon => {
       const isRedeemed = (appState.redeemedCoupons || []).includes(coupon.id);
       const card = document.createElement('div');
       card.className = `coupon-ticket ${isRedeemed ? 'redeemed' : ''}`;
@@ -1071,12 +1077,14 @@ function initCoupons() {
       btn.addEventListener('click', () => {
         const id = btn.dataset.id;
         if (!appState.redeemedCoupons) appState.redeemedCoupons = [];
-        appState.redeemedCoupons.push(id);
-        saveState(appState);
-        sound.playChime('celebrate');
-        showToast('Coupon Redeemed! Enjoy your royal favor 👑');
-        broadcastSync('coupon_redeemed', { couponId: id });
-        renderCoupons();
+        if (!appState.redeemedCoupons.includes(id)) {
+          appState.redeemedCoupons.push(id);
+          saveState(appState);
+          sound.playChime('celebrate');
+          showToast('Coupon Redeemed! Enjoy your royal favor 👑');
+          broadcastSync('coupon_redeemed', { couponId: id });
+          renderCoupons();
+        }
       });
     });
   }
@@ -1086,11 +1094,13 @@ function initCoupons() {
       const t = titleInput.value.trim();
       const d = descInput.value.trim();
       if (!t) return;
-      INITIAL_COUPONS.push({
+      if (!appState.customCoupons) appState.customCoupons = [];
+      appState.customCoupons.push({
         id: 'custom_' + Date.now(),
         title: `🎁 ${t}`,
         desc: d || 'Valid anytime between husband and wife!'
       });
+      saveState(appState);
       titleInput.value = '';
       descInput.value = '';
       sound.playChime('celebrate');
@@ -1532,7 +1542,6 @@ function initPasscodeGate() {
   // Check if PIN lock is disabled or already unlocked this session
   if (!appState.pinLockEnabled || sessionStorage.getItem('velvet_unlocked') === 'true') {
     gate.classList.add('unlocked');
-    return;
   }
 
   let enteredPin = '';
@@ -1670,6 +1679,25 @@ function initPasscodeGate() {
 
   if (lockNowBtn) lockNowBtn.addEventListener('click', lockAppNow);
   if (modalLockNowBtn) modalLockNowBtn.addEventListener('click', lockAppNow);
+
+  const inlineSettingsBtn = document.getElementById('inline-settings-btn');
+  const navSettingsTab = document.getElementById('nav-settings-tab');
+
+  if (inlineSettingsBtn) {
+    inlineSettingsBtn.addEventListener('click', () => {
+      sound.playChime('soft');
+      updatePinReminder();
+      if (settingsModal) settingsModal.classList.remove('hidden');
+    });
+  }
+
+  if (navSettingsTab) {
+    navSettingsTab.addEventListener('click', () => {
+      sound.playChime('soft');
+      updatePinReminder();
+      if (settingsModal) settingsModal.classList.remove('hidden');
+    });
+  }
 }
 
 
